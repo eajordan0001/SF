@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a8fc1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="超釩SF">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>超釩 Super Fan｜客戶查詢</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ══════════════ HEADER ══════════════ -->
+  <header class="app-header">
+
+    <!-- 品牌列 -->
+    <div class="header-brand">
+      <div class="brand">
+        <img src="icons/logo.png" alt="" class="logo" onerror="this.style.display='none'">
+        <div class="brand-text">
+          <span class="brand-zh">超釩</span>
+          <span class="brand-en">Super Fan</span>
+        </div>
+      </div>
+      <button class="icon-btn" id="refresh-btn" title="重新整理">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+          <path d="M21 3v5h-5"/>
+          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+          <path d="M8 16H3v5"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 搜尋列 -->
+    <div class="search-wrap">
+      <div class="search-box">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="search" id="search-input"
+          placeholder="搜尋公司、電話、聯絡人…"
+          autocomplete="off" autocorrect="off" spellcheck="false">
+        <button class="clear-btn" id="clear-btn" hidden>
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 類型篩選 -->
+    <div class="filter-row">
+      <span class="filter-label">類型</span>
+      <div class="chips" id="type-chips">
+        <button class="chip active" data-type="all">全部</button>
+        <button class="chip" data-type="今日">今日配送</button>
+        <button class="chip" data-type="冷藏">冷藏品</button>
+        <button class="chip" data-type="注意">需注意</button>
+      </div>
+    </div>
+
+    <!-- 行政區篩選（由 JS 動態產生） -->
+    <div class="filter-row" id="district-row">
+      <span class="filter-label">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        地區
+      </span>
+      <div class="chips" id="district-chips"></div>
+    </div>
+
+  </header>
+
+  <!-- ══════════════ LIST VIEW ══════════════ -->
+  <main id="list-view" class="view active">
+
+    <!-- 狀態列 + 篩選提示 -->
+    <div class="status-bar">
+      <span id="result-count">載入中…</span>
+      <span id="last-updated"></span>
+    </div>
+    <div class="active-filters" id="active-filters" hidden>
+      <span id="active-filters-text"></span>
+      <button id="clear-filters-btn">✕ 清除</button>
+    </div>
+
+    <!-- 客戶列表 -->
+    <div id="customer-list" class="customer-list"></div>
+
+    <!-- 空狀態 -->
+    <div id="empty-state" class="empty-state" hidden>
+      <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <p>找不到相符的客戶</p>
+      <span>請嘗試其他關鍵字</span>
+    </div>
+
+  </main>
+
+  <!-- ══════════════ DETAIL VIEW ══════════════ -->
+  <main id="detail-view" class="view">
+    <button class="back-btn" id="back-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+      返回列表
+    </button>
+    <div id="detail-content"></div>
+  </main>
+
+  <!-- ══════════════ LOADING ══════════════ -->
+  <div id="loading" class="loading-overlay">
+    <div class="loader-inner">
+      <div class="sf-spinner">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <span class="sf-text">SF</span>
+      </div>
+      <p>資料載入中…</p>
+    </div>
+  </div>
+
+  <!-- ══════════════ TOAST ══════════════ -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
